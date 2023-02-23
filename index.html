@@ -1,0 +1,100 @@
+
+<style>
+    #g-recaptcha-response {
+        display: block !important;
+        position: absolute;
+        margin: -78px 0 0 0 !important;
+        width: 302px !important;
+        height: 76px !important;
+        z-index: -999999;
+        opacity: 0;
+    }
+</style>
+<script src="https://unpkg.com/tailwindcss-jit-cdn@1.3.0/dist/tailwindcss-jit-cdn.umd.min.js"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://www.google.com/recaptcha/api.js"></script>
+<script>
+    var form;
+    var button;
+
+    window.onload = function () {
+        form = document.getElementById('contact-form');
+        button = document.getElementById('submit-button');
+        const $recaptcha = document.querySelector('#g-recaptcha-response');
+        if ($recaptcha) {
+            $recaptcha.setAttribute('required', 'required');
+        }
+    }
+
+    function submitContactForm(event){
+
+        var data = {};
+        for (var i = 0, ii = form.length; i < ii; ++i) {
+            var input = form[i];
+            if (input.name) {
+                data[input.name] = input.value;
+            }
+        }
+        
+
+        axios({
+            method: 'post',
+            url: '<--action url-->',
+            headers: ['Content-type', 'application/json; charset=UTF-8'],
+            data: data
+        }).then(response => {
+            if(response.data.success){
+                let prompt = document.getElementById('message-prompt');
+                prompt.classList.remove("collapse");
+                prompt.classList.add("visible");
+                form.reset();
+            }
+        });
+        
+    };
+</script>
+
+<div id="message-prompt" class="collapse my-10 bg-blue-100 border-t border-b border-blue-500 text-blue-700 px-4 py-3" role="alert">
+  <p class="font-bold">Hello there!</p>
+  <p class="text-sm">Thank you for reaching out. I'll get back to you soon.</p>
+</div>
+
+<form id="contact-form" onsubmit="submitContactForm(event); return false" method="POST">
+  <div class="mb-3 pt-0">
+    <input
+      type="text"
+      placeholder="Your name"
+      name="name"
+      class="px-3 py-3 placeholder-gray-400 text-gray-600 relative bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
+      required
+    />
+  </div>
+  <div class="mb-3 pt-0">
+    <input
+      type="email"
+      placeholder="Email"
+      name="email"
+      class="px-3 py-3 placeholder-gray-400 text-gray-600 relative bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
+      required
+    />
+  </div>
+  <div class="mb-3 pt-0">
+    <textarea
+      rows="8"
+      placeholder="Your message"
+      name="message"
+      class="px-3 py-3 placeholder-gray-400 text-gray-600 relative bg-white bg-white rounded text-sm border-0 shadow outline-none focus:outline-none focus:ring w-full"
+      required
+    ></textarea>
+  </div>
+  <div class="mb-3 pt-0">
+    <div class="g-recaptcha" data-sitekey="<--reCAPTCHA v2 site key-->"></div>
+    <br/>
+    <button
+        id="active-button"
+        class="bg-blue-500 text-white active:bg-blue-600 font-bold text-sm px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+        type="submit"  
+    >Send a message</button>
+
+  </div>
+</form>
